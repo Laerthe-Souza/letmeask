@@ -10,6 +10,7 @@ export const Container = styled.div<ContainerProps>`
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   padding: 24px;
+  text-align: left;
 
   ${props =>
     props.isHighlighted &&

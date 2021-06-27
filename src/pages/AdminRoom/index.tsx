@@ -1,5 +1,6 @@
 import { useHistory, useParams } from 'react-router-dom';
 
+import emptyQuestionsImg from '../../assets/images/empty-questions.svg';
 import deleteImg from '../../assets/images/delete.svg';
 import checkImg from '../../assets/images/check.svg';
 import answerImg from '../../assets/images/answer.svg';
@@ -33,22 +34,28 @@ export const AdminRoom: React.FC = () => {
 
       history.push('/');
     } catch (error) {
-      console.log(error.message);
-
       alert('Você não tem permissão para realizar essa operação');
     }
   }
 
   async function handleCheckQuestionAsAnswered(questionId: string) {
-    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
-      isAnswered: true,
-    });
+    try {
+      await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+        isAnswered: true,
+      });
+    } catch (error) {
+      alert('Você não tem permissão para realizar essa operação');
+    }
   }
 
   async function handleHighlightQuestion(questionId: string) {
-    await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
-      isHighlighted: true,
-    });
+    try {
+      await database.ref(`rooms/${roomId}/questions/${questionId}`).update({
+        isHighlighted: true,
+      });
+    } catch (error) {
+      alert('Você não tem permissão para realizar essa operação');
+    }
   }
 
   async function handleDeleteQuestion(questionId: string) {
@@ -57,7 +64,11 @@ export const AdminRoom: React.FC = () => {
     );
 
     if (result) {
-      await database.ref(`rooms/${roomId}/questions/${questionId}`).remove();
+      try {
+        await database.ref(`rooms/${roomId}/questions/${questionId}`).remove();
+      } catch (error) {
+        alert('Você não tem permissão para realizar essa operação');
+      }
     }
   }
 
@@ -84,40 +95,51 @@ export const AdminRoom: React.FC = () => {
         </div>
 
         <div className="question-list">
-          {questions.map(question => (
-            <Question
-              key={question.id}
-              author={question.author}
-              content={question.content}
-              isAnswered={question.isAnswered}
-              isHighlighted={question.isHighlighted}
-            >
-              {!question.isAnswered && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => handleCheckQuestionAsAnswered(question.id)}
-                  >
-                    <img src={checkImg} alt="Marcar pergunta como respondida" />
-                  </button>
+          {questions.length === 0 ? (
+            <>
+              <img src={emptyQuestionsImg} alt="Nenhuma pergunta" />
 
-                  <button
-                    type="button"
-                    onClick={() => handleHighlightQuestion(question.id)}
-                  >
-                    <img src={answerImg} alt="Dar destaque à pergunta" />
-                  </button>
-                </>
-              )}
-
-              <button
-                type="button"
-                onClick={() => handleDeleteQuestion(question.id)}
+              <p>Nenhuma pergunta por aqui...</p>
+            </>
+          ) : (
+            questions.map(question => (
+              <Question
+                key={question.id}
+                author={question.author}
+                content={question.content}
+                isAnswered={question.isAnswered}
+                isHighlighted={question.isHighlighted}
               >
-                <img src={deleteImg} alt="Remover pergunta" />
-              </button>
-            </Question>
-          ))}
+                {!question.isAnswered && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => handleCheckQuestionAsAnswered(question.id)}
+                    >
+                      <img
+                        src={checkImg}
+                        alt="Marcar pergunta como respondida"
+                      />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleHighlightQuestion(question.id)}
+                    >
+                      <img src={answerImg} alt="Dar destaque à pergunta" />
+                    </button>
+                  </>
+                )}
+
+                <button
+                  type="button"
+                  onClick={() => handleDeleteQuestion(question.id)}
+                >
+                  <img src={deleteImg} alt="Remover pergunta" />
+                </button>
+              </Question>
+            ))
+          )}
         </div>
       </main>
     </Container>

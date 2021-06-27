@@ -82,7 +82,18 @@ export const Container = styled.div`
     }
 
     div.question-list {
+      text-align: center;
       margin-top: 32px;
+
+      > img {
+        margin-bottom: 10px;
+      }
+
+      > p {
+        color: #29292e;
+        font-size: 18px;
+        font-weight: 500;
+      }
     }
   }
 `;
