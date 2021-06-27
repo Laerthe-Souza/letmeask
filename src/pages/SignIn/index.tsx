@@ -6,15 +6,23 @@ import logoImg from '../../assets/images/logo.svg';
 import googleIconImg from '../../assets/images/google-icon.svg';
 import { Button } from '../../components/Button';
 import { useAuth } from '../../hooks/useAuth';
-
-import { Container } from './styles';
 import { database } from '../../services/firebase';
 
+import { Container } from './styles';
+import { useLoading } from '../../hooks/useLoading';
+
 export const SignIn: React.FC = () => {
+  const { startLoading, stopLoading } = useLoading();
   const { signInWithGoogle, user } = useAuth();
   const history = useHistory();
 
   const [roomCode, setRoomCode] = useState('');
+
+  async function handleNavigateToRoomsList() {
+    startLoading();
+
+    history.push('/rooms/list');
+  }
 
   async function handleCreateRoom() {
     if (!user) {
@@ -31,19 +39,27 @@ export const SignIn: React.FC = () => {
       return;
     }
 
+    startLoading();
+
     const roomRef = await database.ref(`rooms/${roomCode}`).get();
 
     if (!roomRef.exists()) {
+      stopLoading();
+
       alert('Room does not exists');
 
       return;
     }
 
     if (roomRef.val().closedAt) {
+      stopLoading();
+
       alert('Room already closed');
 
       return;
     }
+
+    stopLoading();
 
     history.push(`/rooms/${roomCode}`);
   }
@@ -83,7 +99,14 @@ export const SignIn: React.FC = () => {
               onChange={event => setRoomCode(event.target.value)}
             />
 
-            <Button type="submit">Entrar na sala</Button>
+            <div className="form-footer">
+              <Button type="submit">Entrar na sala</Button>
+
+              <Button type="submit" onClick={handleNavigateToRoomsList}>
+                {' '}
+                Ver todas as sala
+              </Button>
+            </div>
           </form>
         </div>
       </main>

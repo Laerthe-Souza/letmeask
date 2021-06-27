@@ -44,7 +44,7 @@ export const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 320px;
+    max-width: 400px;
     align-items: stretch;
     text-align: center;
 
@@ -59,6 +59,11 @@ export const Container = styled.div`
         padding: 0 16px;
         background-color: #fff;
         border: 1px solid #a8a8b3;
+      }
+
+      div.form-footer {
+        display: flex;
+        gap: 16px;
       }
 
       button {

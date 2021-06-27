@@ -1,27 +1,20 @@
-import {
-  useState,
-  useCallback,
-  useContext,
-  createContext,
-  useEffect,
-} from 'react';
+import { useState, useCallback, createContext, useEffect } from 'react';
 import firebase from 'firebase';
 
 import { auth } from '../services/firebase';
 
-interface User {
+type User = {
   id: string;
   name: string;
   avatar: string;
-  userType1?: 'admin' | 'user';
-}
+};
 
-interface AuthContextData {
+export type AuthContextData = {
   user: User | undefined;
   signInWithGoogle: () => Promise<void>;
-}
+};
 
-const AuthContext = createContext({} as AuthContextData);
+export const AuthContext = createContext({} as AuthContextData);
 
 export const AuthProvider: React.FC = ({ children }) => {
   const [user, setUser] = useState<User>();
@@ -74,9 +67,3 @@ export const AuthProvider: React.FC = ({ children }) => {
     </AuthContext.Provider>
   );
 };
-
-export function useAuth(): AuthContextData {
-  const context = useContext(AuthContext);
-
-  return context;
-}

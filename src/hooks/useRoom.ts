@@ -2,6 +2,15 @@ import { useEffect, useState } from 'react';
 import { database } from '../services/firebase';
 import { useAuth } from './useAuth';
 
+type Room = {
+  id: string;
+  title: string;
+  authorId: string;
+  authorName: string;
+  authorAvatar: string;
+  isClosed: boolean;
+};
+
 type FirebaseQuestion = Record<
   string,
   {
@@ -35,23 +44,33 @@ type Questions = {
 };
 
 type UseRoomData = {
+  room: Room;
   questions: Questions[];
   title: string;
+  closedRoom: boolean;
 };
 
 export const useRoom = (roomId: string): UseRoomData => {
   const { user } = useAuth();
 
+  const [room, setRoom] = useState<Room>({} as Room);
   const [questions, setQuestions] = useState<Questions[]>([]);
+  const [closedRoom, setClosedRoom] = useState(false);
   const [title, setTitle] = useState('');
 
   useEffect(() => {
     const roomRef = database.ref(`rooms/${roomId}`);
 
-    roomRef.on('value', room => {
-      const databaseRoom = room.val();
+    roomRef.on('value', databaseRoom => {
+      if (databaseRoom.val().closedAt) {
+        setClosedRoom(true);
 
-      const firebaseQuestions = databaseRoom.questions as FirebaseQuestion;
+        return;
+      }
+
+      const roomData = databaseRoom.val();
+
+      const firebaseQuestions = roomData.questions as FirebaseQuestion;
 
       const parsedQuestions = Object.entries(firebaseQuestions ?? {}).map(
         ([questionKey, value]) => {
@@ -63,13 +82,14 @@ export const useRoom = (roomId: string): UseRoomData => {
             isAnswered: value.isAnswered,
             likesCount: Object.values(value.likes ?? {}).length,
             likeId: Object.entries(value.likes ?? {}).find(
-              ([likeKey, like]) => like.authorId === user?.id,
+              ([, like]) => like.authorId === user?.id,
             )?.[0],
           };
         },
       );
 
-      setTitle(databaseRoom.title);
+      setRoom(roomData);
+      setTitle(roomData.title);
       setQuestions(parsedQuestions);
     });
 
@@ -78,5 +98,5 @@ export const useRoom = (roomId: string): UseRoomData => {
     };
   }, [roomId, user?.id]);
 
-  return { questions, title };
+  return { room, questions, title, closedRoom };
 };

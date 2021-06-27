@@ -47,23 +47,6 @@ export const Container = styled.div<ContainerProps>`
     align-items: center;
     margin-top: 24px;
 
-    > div.user-info {
-      display: flex;
-      align-items: center;
-
-      > img {
-        width: 32px;
-        height: 32px;
-        border-radius: 50%;
-      }
-
-      > span {
-        margin-left: 8px;
-        color: #737380;
-        font-size: 14px;
-      }
-    }
-
     > div {
       display: flex;
       gap: 16px;

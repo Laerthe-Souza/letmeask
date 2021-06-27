@@ -1,6 +1,5 @@
 import { useHistory, useParams } from 'react-router-dom';
 
-import logoImg from '../../assets/images/logo.svg';
 import deleteImg from '../../assets/images/delete.svg';
 import checkImg from '../../assets/images/check.svg';
 import answerImg from '../../assets/images/answer.svg';
@@ -11,6 +10,8 @@ import { useRoom } from '../../hooks/useRoom';
 
 import { Container } from './styles';
 import { database } from '../../services/firebase';
+import { Header } from '../../components/Header';
+import { UserInfo } from '../../components/UserInfo';
 
 interface ParamsData {
   id: string;
@@ -20,16 +21,22 @@ export const AdminRoom: React.FC = () => {
   const history = useHistory();
   const params = useParams<ParamsData>();
 
-  const { questions, title } = useRoom(params.id);
+  const { room, questions, title } = useRoom(params.id);
 
   const roomId = params.id;
 
   async function handleCloseRoom() {
-    await database.ref(`rooms/${roomId}`).update({
-      closedAt: new Date(),
-    });
+    try {
+      await database.ref(`rooms/${roomId}`).update({
+        closedAt: new Date(),
+      });
 
-    history.push('/');
+      history.push('/');
+    } catch (error) {
+      console.log(error.message);
+
+      alert('Você não tem permissão para realizar essa operação');
+    }
   }
 
   async function handleCheckQuestionAsAnswered(questionId: string) {
@@ -56,19 +63,19 @@ export const AdminRoom: React.FC = () => {
 
   return (
     <Container>
-      <header>
-        <div className="content">
-          <img src={logoImg} alt="Letmeask" />
-
-          <div>
-            <RoomCode code={roomId} />
-
-            <Button isOutlined type="button" onClick={handleCloseRoom}>
-              Encerrar sala
-            </Button>
-          </div>
+      <Header>
+        <div className="host">
+          <UserInfo name={room.authorName} avatar={room.authorAvatar} />
         </div>
-      </header>
+
+        <div>
+          <RoomCode code={roomId} />
+
+          <Button isOutlined type="button" onClick={handleCloseRoom}>
+            Encerrar sala
+          </Button>
+        </div>
+      </Header>
 
       <main>
         <div className="room-title">

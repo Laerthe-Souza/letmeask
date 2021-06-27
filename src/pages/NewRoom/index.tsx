@@ -5,11 +5,13 @@ import illustrationImg from '../../assets/images/illustration.svg';
 import logoImg from '../../assets/images/logo.svg';
 import { Button } from '../../components/Button';
 import { useAuth } from '../../hooks/useAuth';
+import { useLoading } from '../../hooks/useLoading';
 import { database } from '../../services/firebase';
 
 import { Container } from './styles';
 
 export const NewRoom: React.FC = () => {
+  const { startLoading, stopLoading } = useLoading();
   const { user } = useAuth();
   const history = useHistory();
 
@@ -17,6 +19,8 @@ export const NewRoom: React.FC = () => {
 
   async function handleCreateRoom(event: FormEvent) {
     event.preventDefault();
+
+    startLoading();
 
     if (newRoom.trim() === '') {
       return;
@@ -27,7 +31,11 @@ export const NewRoom: React.FC = () => {
     const firebaseRoom = await roomRef.push({
       title: newRoom,
       authorId: user?.id,
+      authorName: user?.name,
+      authorAvatar: user?.avatar,
     });
+
+    stopLoading();
 
     history.push(`/admin/rooms/${firebaseRoom.key}`);
   }

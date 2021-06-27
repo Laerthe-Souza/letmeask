@@ -6,8 +6,6 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   isOutlined?: boolean;
 };
 
-const Button: React.FC<ButtonProps> = ({ isOutlined, ...rest }) => {
+export const Button: React.FC<ButtonProps> = ({ isOutlined, ...rest }) => {
   return <Container className={isOutlined ? 'outlined' : ''} {...rest} />;
 };
-
-export { Button };
